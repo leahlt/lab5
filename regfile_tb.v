@@ -1,4 +1,5 @@
 module regfile_tb();
+//top-level test case (also intended for autograder) that runs the regfile module
 	reg [15:0] sim_data_in;
 	reg [2:0] sim_writenum, sim_readnum;
 	reg sim_write, sim_clk;
@@ -16,7 +17,7 @@ module regfile_tb();
 	);
 	
 	
-	task my_regfile_checker;
+	task my_regfile_checker; //checks that the proper register is being read/written to, checks that data_out=data_in
 		input [2:0] expected_reg;
 		input [15:0] expected_readout;
 		
@@ -33,7 +34,7 @@ module regfile_tb();
 		end
 	endtask
 	
-	task my_regfilemem_checker;
+	task my_regfilemem_checker; //checks that a register outputs expected value... used mostly to check that past registers (different read/write) still hold the correct value
 	input [15:0] expected_out;
 	
 	begin
@@ -49,6 +50,7 @@ module regfile_tb();
 	
 	
 	initial begin
+		err = 1'b0; //initialize err
 		//Register 0, data_in 3
 		sim_clk = 1'b0; //clk off
 		sim_data_in = 16'b0000_0000_0000_0011 ; //3
@@ -58,9 +60,9 @@ module regfile_tb();
 		#10
 		
 		$display("Moving to register 0, check for binary 3");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1; 
 		#10;
-		my_regfile_checker(3'b000, 16'b0000_0000_0000_0011);
+		my_regfile_checker(3'b000, 16'b0000_0000_0000_0011); //expecting that read/write register is 000 and that binary data output is 0000_0000_0000_0011
 		#10
 		
 		
@@ -74,13 +76,13 @@ module regfile_tb();
 		#10		
 		
 		$display("Moving to register 1, check for binary 320");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1; 
 		#10;
-		my_regfile_checker(3'b001, 16'b0000_0001_0100_0000);
+		my_regfile_checker(3'b001, 16'b0000_0001_0100_0000); //expecting that read/write register is 001 and that binary data output is 0000_0001_0100_0000
 		#10
 		sim_readnum = 3'b000; //read register 0
 		#10
-		my_regfilemem_checker(16'b0000_0000_0000_0011); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b0000_0000_0000_0011); //checks the value in the last register assigned, not current write register. Reading register 0, expecting out is 0000_0000_0000_0011
 		
 		
 		
@@ -93,18 +95,17 @@ module regfile_tb();
 		#10
 		
 		$display("Moving to register 2, check for binary 34464");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1; 
 		#10;
-		my_regfile_checker(3'b010, 16'b1000_0110_1010_0000);
+		my_regfile_checker(3'b010, 16'b1000_0110_1010_0000); //expecting that read/write register is 010 and that binary data output is 1000_0110_1010_0000
 		#10
 		sim_readnum = 3'b001; //read register 1
 		#10
-		my_regfilemem_checker(16'b0000_0001_0100_0000); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b0000_0001_0100_0000); //checks the value in the last register assigned, not current write register. Reading register 1, expecting out is 0000_0001_0100_0000
 		
 		
 		
 		//Register 3, data_in 42
-		err = 1'b0;
 		sim_clk = 1'b0;
 		sim_data_in = 16'b0000_0000_0010_1010 ; //42
 		sim_writenum = 3'b011; //write register 3
@@ -113,13 +114,13 @@ module regfile_tb();
 		#10
 		
 		$display("Moving to register 3, check for binary 42");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1; 
 		#10;
-		my_regfile_checker(3'b011, 16'b0000_0000_0010_1010);
+		my_regfile_checker(3'b011, 16'b0000_0000_0010_1010); //expecting that read/write register is 011 and that binary data output is 0000_0000_0010_1010
 		#10
 		sim_readnum = 3'b010; //read register 2
 		#10
-		my_regfilemem_checker(16'b1000_0110_1010_0000); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b1000_0110_1010_0000); //checks the value in the last register assigned, not current write register. Reading register 2, expecting out is 1000_0110_1010_0000
 	
 		
 		
@@ -132,13 +133,13 @@ module regfile_tb();
 		#10		
 		
 		$display("Moving register 4, check for binary 5");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1;
 		#10;
-		my_regfile_checker(3'b100, 16'b0000_0000_0000_0101);
+		my_regfile_checker(3'b100, 16'b0000_0000_0000_0101); //expecting that read/write register is 100 and that binary data output is 0000_0000_0000_0101
 		#10
 		sim_readnum = 3'b011; //read register 3
 		#10
-		my_regfilemem_checker(16'b0000_0000_0010_1010); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b0000_0000_0010_1010); //checks the value in the last register assigned, not current write register. Reading register 3, expecting out is 0000_0000_0010_1010
 		
 		
 		
@@ -151,13 +152,13 @@ module regfile_tb();
 		#10		
 		
 		$display("Moving register 5, check for binary 4");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1;
 		#10;
-		my_regfile_checker(3'b101, 16'b0000_0000_0000_0100);
+		my_regfile_checker(3'b101, 16'b0000_0000_0000_0100); //expecting that read/write register is 101 and that binary data output is 0000_0000_0000_0100
 		#10
 		sim_readnum = 3'b100; //read register 4
 		#10
-		my_regfilemem_checker(16'b0000_0000_0000_0101); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b0000_0000_0000_0101); //checks the value in the last register assigned, not current write register. Reading register 4, expecting out is 0000_0000_0000_0101
 		
 		
 		
@@ -170,14 +171,14 @@ module regfile_tb();
 		#10
 		
 		$display("Moving register 6, check for binary 5");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1;  
 		#10;
-		my_regfile_checker(3'b110, 16'b0000_0000_0000_0101);
+		my_regfile_checker(3'b110, 16'b0000_0000_0000_0101); //expecting that read/write register is 110 and that binary data output is 0000_0000_0000_0101
 		#10
 		sim_readnum = 3'b101; //read register 5
 		#10
-		my_regfilemem_checker(16'b0000_0000_0000_0100); //checks the value in the last register assigned, not current write register
-		
+		my_regfilemem_checker(16'b0000_0000_0000_0100); //checks the value in the last register assigned, not current write register. Reading register 5, expecting out is 0000_0000_0000_0100
+		#10
 		
 		
 		//Register for 7, data_in 0
@@ -189,40 +190,52 @@ module regfile_tb();
 		#10
 		
 		$display("Moving register 7, check for binary 0");
-		sim_clk = 1'b1; //now something can happen;
+		sim_clk = 1'b1;  
 		#10;
-		my_regfile_checker(3'b111, 16'b0000_0000_0000_0000);
+		my_regfile_checker(3'b111, 16'b0000_0000_0000_0000); //expecting that read/write register is 111 and that binary data output is 0000_0000_0000_0000
 		#10
 		sim_readnum = 3'b110; //read register 6
 		#10
-		my_regfilemem_checker(16'b0000_0000_0000_0101); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b0000_0000_0000_0101); //checks the value in the last register assigned, not current write register. Reading register 6, expecting out is 0000_0000_0000_0101
 		
 		#10
 		sim_readnum = 3'b111; //read register 7
 		#10
-		my_regfilemem_checker(16'b0000_0000_0000_0000); //checks the value in the last register assigned, not current write register
+		my_regfilemem_checker(16'b0000_0000_0000_0000); //checks the value in the last register assigned, not current write register. Reading register 7, expecting out is 0000_0000_0000_0000
 		
 		
 		
 		
 		
+		//Quick check rewriting over a register
+		//Register for 6, data_in 1
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0000_0000_0001 ; //0
+		sim_writenum = 3'b110 ; //write register 7
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b110; //read register 7
+		#10
 		
-		if(~err) $display("PASSED"); //prints final "verdict" on testbench depends on err from task my_FSM_checker
+		$display("Moving register 7, check for binary 1");
+		sim_clk = 1'b1; 
+		#10;
+		my_regfile_checker(3'b110, 16'b0000_0000_0000_0001); //expecting that read/write register is 110 and that binary data output is 0000_0000_0000_0001
+		#10;
+		
+		
+		
+		if(~err) $display("PASSED"); //prints final "verdict" on testbench depends on err
 		else $display("FAILED");
 		
 		$stop;
-		
-	end
-	//still haven't really check what happens when we try to read a register we haven't just written to, I think it will hold the value
-	
-	
+	end	
 endmodule
 
 
 
 
 
-module mux2_tb (); //regression test for the mux2 module
+module mux2_tb (); //regression-style test for the mux2 module
    reg [15:0] sim_a0;
    reg [15:0] sim_a1;
 	reg sim_s;
@@ -237,7 +250,7 @@ module mux2_tb (); //regression test for the mux2 module
       .b(sim_b)
     );
 
-	 task my_mux_checker;
+	 task my_mux_checker; //checks that the output of the mux is expected
 		input [15:0] expected_out;
 		
 		begin
@@ -250,7 +263,7 @@ module mux2_tb (); //regression test for the mux2 module
 		
 	 
     initial begin
-		sim_a0 = 16'b0000_0000_0000_0000;
+		sim_a0 = 16'b0000_0000_0011_0000;
 		sim_a1 = 16'b0000_0000_0000_0010;
 		err = 0;
 		sim_s = 1'b1;
@@ -258,16 +271,16 @@ module mux2_tb (); //regression test for the mux2 module
 		
 		$display("-----MUX2 CHECK-----");
 		
-		//check a1 goes through
+		//check a1 goes through when s=1. Expected output is 0000_0000_0000_0010
 		$display("Checking MUX2 for s=1") ;
 		my_mux_checker(16'b0000_0000_0000_0010);
 		#10
 		
-		//check a0 goes through
+		//check a0 goes through when s=1. Expected output is 0000_0000_0000_0000
 		sim_s = 1'b0;
 		#10
 		$display("Checking MUX2 for s=0") ;
-		my_mux_checker(16'b0000_0000_0000_0000);
+		my_mux_checker(16'b0000_0000_0011_0000);
 		#10
 		
 		if(~err) $display("PASSED"); //prints final "verdict" on testbench depends on err from task my_FSM_checker
@@ -278,7 +291,7 @@ module mux2_tb (); //regression test for the mux2 module
 endmodule
 	 
 	 
-module mux5_tb (); //regression test for the mux2 module
+module mux8_tb (); //regression-style test for the mux5 module
    reg [15:0] sim_a0;
    reg [15:0] sim_a1;
 	reg [15:0] sim_a2;
@@ -292,7 +305,7 @@ module mux5_tb (); //regression test for the mux2 module
  
    wire [15:0] sim_b;
 
-    mux5 dut (
+    mux8 dut (
       .a0(sim_a0),
       .a1(sim_a1),
 		.a2(sim_a2),
@@ -327,25 +340,24 @@ module mux5_tb (); //regression test for the mux2 module
 		sim_a6 = 16'b0000_0000_0100_0000;
 		sim_a7 = 16'b0000_0000_1000_0000;
 		err = 0;
-		#10
 		
 		$display("-----MUX5 CHECK-----");
 		
-		//check a0 goes through
+		//check a0 goes through when s=0. Expected output is 0000_0000_0000_0001
 		sim_s = 8'b0000_0001;
 		#10
 		my_mux_checker(16'b0000_0000_0000_0001);
 		$display("Checking MUX5 for s=0") ;
 		#10
 		
-		//check a1 goes through
+		//check a1 goes through when s=1. Expected output is 0000_0000_0000_0010
 		sim_s = 8'b0000_0010;
 		#10
 		my_mux_checker(16'b0000_0000_0000_0010);
 		$display("Checking MUX5 for s=1") ;
 		#10
 		
-		//check a2 goes through
+		//check a2 goes through when s=2. Expected output is 0000_0000_0000_0100
 		sim_s = 8'b0000_0100;
 		#10
 		my_mux_checker(16'b0000_0000_0000_0100);
@@ -353,35 +365,35 @@ module mux5_tb (); //regression test for the mux2 module
 		#10
 		
 		
-		//check a3 goes through
+		//check a3 goes through when s=3. Expected output is 0000_0000_0000_1000
 		sim_s = 8'b0000_1000;
 		#10
 		my_mux_checker(16'b0000_0000_0000_1000);
 		$display("Checking MUX5 for s=3") ;
 		#10
 		
-		//check a4 goes through
+		//check a4 goes through when s=4. Expected output is 0000_0000_0001_0000
 		sim_s = 8'b0001_0000;
 		#10
 		my_mux_checker(16'b0000_0000_0001_0000);
 		$display("Checking MUX5 for s=4") ;
 		#10
 		
-		//check a5 goes through
+		//check a5 goes through when s=1. Expected output is 0000_0000_0010_0000
 		sim_s = 8'b0010_0000;
 		#10
 		my_mux_checker(16'b0000_0000_0010_0000);
 		$display("Checking MUX5 for s=5") ;
 		#10
 		
-		//check a6 goes through
+		//check a5 goes through when s=1. Expected output is 0000_0000_0100_0000
 		sim_s = 8'b0100_0000;
 		#10
 		my_mux_checker(16'b0000_0000_0100_0000);
 		$display("Checking MUX5 for s=6") ;
 		#10
 		
-		//check a4 goes through
+		//check a0 goes through when s=1. Expected output is 0000_0000_1000_0000
 		sim_s = 8'b1000_0000;
 		#10
 		my_mux_checker(16'b0000_0000_1000_0000);
@@ -398,7 +410,7 @@ endmodule
 	 
 	 
 	 
-module decoder38_tb (); //regression test for the mux2 module
+module decoder38_tb (); //regression test for the decoder module
    reg [2:0] sim_a;
    wire [7:0] sim_b;
 	reg err;
@@ -428,23 +440,23 @@ module decoder38_tb (); //regression test for the mux2 module
 		
 		$display("-----DECODER CHECK-----");
 		
-		//check for 1 
+		//check for 1. Expected outcome is 0000_0010
 		my_decoder_checker(8'b0000_0010);
 		#10
 		
-		//check for 4
+		//check for 4 Expected outcome is 0001_0000
 		sim_a = 3'b100;
 		#10
 		my_decoder_checker(8'b0001_0000);
 		#10
 		
-		//check for 2
+		//check for 2 Expected outcome is 0000_0100
 		sim_a = 3'b010;
 		#10
 		my_decoder_checker(8'b0000_0100);
 		#10;
 		
-		if(~err) $display("PASSED"); //prints final "verdict" on testbench depends on err from task my_FSM_checker
+		if(~err) $display("PASSED"); //prints final "verdict" on testbench
 		else $display("FAILED");
 		
 		$stop;
