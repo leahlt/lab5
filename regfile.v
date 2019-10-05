@@ -1,11 +1,10 @@
-module regfile(data_in, writenum, write, readnum clk, data_out);
+module regfile(data_in, writenum, write, readnum, clk, data_out);
 	input [15:0] data_in;
 	input [2:0] writenum, readnum;
 	input write, clk;
 	output [15:0] data_out;
 	
-	
-	
+
 	
 	
 endmodule
@@ -45,7 +44,7 @@ module decoder38a(a, b);
 	input [2:0] a;
 	output [7:0] b;
 	
-	wire [7:0] b = 1 << a //why is wire used instead of assign. Ss6 #8
+	wire [7:0] b = 1 << a; //why is wire used instead of assign. Ss6 #8
 	
 endmodule
 
