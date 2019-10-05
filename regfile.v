@@ -5,7 +5,7 @@ module regfile(data_in, writenum, write, readnum, clk, data_out);
 	output [15:0] data_out;
 	
 	wire [7:0] hot_writenum, hot_readnum;
-	wire [15:0] a0, a1, a2, a3, a4, a5, a6, a7;
+	wire [15:0] R0, R1, R2, R3, R4, R5, R6, R7;
 	wire en0, en1, en2, en3, en4, en5, en6, en7;
 	
 	assign en0 = write & hot_writenum[0];
@@ -20,16 +20,16 @@ module regfile(data_in, writenum, write, readnum, clk, data_out);
 	decoder38a writex(writenum, hot_writenum);
    decoder38a readx(readnum, hot_readnum);
 
-	vDFFE r0(clk, en0, data_in, a0);
-	vDFFE r1(clk, en1, data_in, a1);
-	vDFFE r2(clk, en2, data_in, a2);
-	vDFFE r3(clk, en3, data_in, a3);
-	vDFFE r4(clk, en4, data_in, a4);
-	vDFFE r5(clk, en5, data_in, a5);
-	vDFFE r6(clk, en6, data_in, a6);
-	vDFFE r7(clk, en7, data_in, a7);
+	vDFFE r0(clk, en0, data_in, R0);
+	vDFFE r1(clk, en1, data_in, R1);
+	vDFFE r2(clk, en2, data_in, R2);
+	vDFFE r3(clk, en3, data_in, R3);
+	vDFFE r4(clk, en4, data_in, R4);
+	vDFFE r5(clk, en5, data_in, R5);
+	vDFFE r6(clk, en6, data_in, R6);
+	vDFFE r7(clk, en7, data_in, R7);
 	
-   mux8 outx(a0, a1, a2, a3, a4, a5, a6, a7, hot_readnum, data_out);
+   mux8 outx(R0, R1, R2, R3, R4, R5, R6, R7, hot_readnum, data_out);
 
 endmodule
 

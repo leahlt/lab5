@@ -20,7 +20,7 @@ module datapath (clk,
   
   mux2 mod9(datapath_out, datapath_in, vsel, data_in);
   
-  regfile U0(data_in, writenum, write, readnum, clk, data_out);
+  regfile REGFILE(data_in, writenum, write, readnum, clk, data_out);
   
   vDFFE mod3(clk, loada, data_out, Aload);
   vDFFE mod4(clk, loadb, data_out, Bload);

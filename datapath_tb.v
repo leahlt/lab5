@@ -60,6 +60,7 @@ module datapath_tb ();
 	 //-------test case 1----------
 
     // Put 0 in R0
+	 $display("Checking 1nd test case. Following lab5 instructions");
 	 err = 1'b0;
 	 vsel = 1'b1;
 	 datapath_in = 16'b0;
@@ -290,7 +291,7 @@ module datapath_tb ();
 	 
 	 
 	 //-----------Test case 4----------
-	 $display("Checking 3nd test case. Primarily testing regfile");
+	 $display("Checking 4nd test case. Primarily testing regfile");
 	 
     // Write 11312 in r0
 	 vsel = 1'b1;

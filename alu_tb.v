@@ -42,7 +42,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 9 );
   
-  
+
   // checking if it correctly overflow, expecting a 0
   Ain = 16'b1111_1111_1111_1111;
   Bin = 1;
@@ -67,6 +67,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 0 );
   
+
   // 5 - 4 = 1
   Ain = 5;
   Bin = 4;
@@ -74,6 +75,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 1 );
   
+
   // random binary... expecting a 0
   Ain = 16'b0010_0101_0100_0101;
   Bin = 16'b0010_0101_0100_0101;
@@ -81,6 +83,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 16'b0000_0000_0000_0000 );
   
+
   // 49103 - 12451 = 49103 - 12451
   Ain = 49103;
   Bin = 12451;
@@ -89,6 +92,7 @@ module ALU_tb ();
   ALU_checker ( 49103 - 12451 );
   
   // test AND
+
   
   // 0 & 0 = 0
   ALUop = 2'b10;
@@ -98,6 +102,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 0 );
   
+
   // Same number anded is equal to that number
   Ain = 16'b0010_0101_0100_0101;
   Bin = 16'b0010_0101_0100_0101;
@@ -105,6 +110,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 16'b0010_0101_0100_0101 );
   
+
   // ( Ain & ~Ain ) = 0
   Ain = 16'b0010_0101_0100_0101;
   Bin = 16'b1101_1010_1011_1010;
@@ -112,6 +118,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 16'b0000_0000_0000_0000 );
   
+
   // Random number anded together
   Ain = 14152;
   Bin = 12451;
@@ -120,6 +127,7 @@ module ALU_tb ();
   ALU_checker ( 14152 & 12451 );
  
   // test negate
+
   
   // negation of 0 is 1
   ALUop = 2'b11;
@@ -129,6 +137,7 @@ module ALU_tb ();
   #5
   ALU_checker ( 16'b1111_1111_1111_1111 );
   
+
   // negation of 111111111 is 0000000
   Ain = 21415;
   Bin = 16'b1111_1111_1111_1111;
@@ -136,13 +145,15 @@ module ALU_tb ();
   #5
   ALU_checker ( 16'b0000_0000_0000_0000 );
   
+
   // using the negation function of verilog
   Ain = 5142;
   Bin = 14151;
   
   #5
   ALU_checker ( ~14151 );
- 
+
+    
   // ~1010110000110101 = 0101001111001010
   Ain = 21512;
   Bin = 16'b1010_1100_0011_0101;
@@ -152,8 +163,8 @@ module ALU_tb ();
  
   #5;
   
+
   if(~err) $display("PASSED"); //prints final "verdict" on testbench
   else $display("FAILED");
-		
   end
 endmodule
