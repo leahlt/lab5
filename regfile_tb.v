@@ -1,3 +1,227 @@
+module regfile_tb();
+	reg [15:0] sim_data_in;
+	reg [2:0] sim_writenum, sim_readnum;
+	reg sim_write, sim_clk;
+	reg err;
+	
+	wire [15:0] sim_data_out;
+	
+	regfile dut(
+		.data_in(sim_data_in),
+		.writenum(sim_writenum),
+		.readnum(sim_readnum),
+		.clk(sim_clk),
+		.write(sim_write),
+		.data_out(sim_data_out)
+	);
+	
+	
+	task my_regfile_checker;
+		input [2:0] expected_reg;
+		input [15:0] expected_readout;
+		
+		begin
+			if(sim_writenum & sim_readnum !== expected_reg) begin
+				$display("ERROR ** writenum and readnum don't match. Write is %b, read is %b, expected %b", sim_writenum, sim_readnum, expected_reg) ; //check that the right reg is being accessed by write/read
+				err = 1'b1;
+			end
+			
+			if(sim_data_out !== expected_readout) begin
+				$display("ERROR ** output is %b, expected %b", sim_data_out, expected_readout) ; //check that the number in is the number out (data)
+				err = 1'b1;
+			end
+		end
+	endtask
+	
+	task my_regfilemem_checker;
+	input [15:0] expected_out;
+	
+	begin
+		if (sim_data_out !== expected_out) begin
+			$display("ERROR ** output is %b, expected %b", sim_data_out, expected_out) ; //check that the number in is the number out (data)
+				err = 1'b1;
+		end
+	end
+		
+	endtask
+	
+	
+	
+	
+	initial begin
+		//Register 0, data_in 3
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0000_0000_0011 ; //3
+		sim_writenum = 3'b000 ; //write register 0
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b000; //read register 0
+		#10
+		
+		$display("Moving to register 0, check for binary 3");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b000, 16'b0000_0000_0000_0011);
+		#10
+		
+		
+		
+		//Register 1, data_in 320
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0001_0100_0000 ; //320
+		sim_writenum = 3'b001 ; //write register 1
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b001; //read register 1
+		#10		
+		
+		$display("Moving to register 1, check for binary 320");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b001, 16'b0000_0001_0100_0000);
+		#10
+		sim_readnum = 3'b000; //read register 0
+		#10
+		my_regfilemem_checker(16'b0000_0000_0000_0011); //checks the value in the last register assigned, not current write register
+		
+		
+		
+		//Register 2, data_in 34464
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b1000_0110_1010_0000 ; //34464
+		sim_writenum = 3'b010 ; //write register 2
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b010; //read register 2
+		#10
+		
+		$display("Moving to register 2, check for binary 34464");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b010, 16'b1000_0110_1010_0000);
+		#10
+		sim_readnum = 3'b001; //read register 1
+		#10
+		my_regfilemem_checker(16'b0000_0001_0100_0000); //checks the value in the last register assigned, not current write register
+		
+		
+		
+		//Register 3, data_in 42
+		err = 1'b0;
+		sim_clk = 1'b0;
+		sim_data_in = 16'b0000_0000_0010_1010 ; //42
+		sim_writenum = 3'b011; //write register 3
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b011; //read register 3
+		#10
+		
+		$display("Moving to register 3, check for binary 42");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b011, 16'b0000_0000_0010_1010);
+		#10
+		sim_readnum = 3'b010; //read register 2
+		#10
+		my_regfilemem_checker(16'b1000_0110_1010_0000); //checks the value in the last register assigned, not current write register
+	
+		
+		
+		//Register 4, data_in 5
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0000_0000_0101 ; //5
+		sim_writenum = 3'b100 ; //write register 4
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b100; //read register 4
+		#10		
+		
+		$display("Moving register 4, check for binary 5");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b100, 16'b0000_0000_0000_0101);
+		#10
+		sim_readnum = 3'b011; //read register 3
+		#10
+		my_regfilemem_checker(16'b0000_0000_0010_1010); //checks the value in the last register assigned, not current write register
+		
+		
+		
+		//Register 5, data_in 4
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0000_0000_0100 ; //4
+		sim_writenum = 3'b101 ; //write register 5
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b101; //read register 5
+		#10		
+		
+		$display("Moving register 5, check for binary 4");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b101, 16'b0000_0000_0000_0100);
+		#10
+		sim_readnum = 3'b100; //read register 4
+		#10
+		my_regfilemem_checker(16'b0000_0000_0000_0101); //checks the value in the last register assigned, not current write register
+		
+		
+		
+		//Register 6, data_in 5
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0000_0000_0101 ; //5
+		sim_writenum = 3'b110 ; //write register 6
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b110; //read register 6
+		#10
+		
+		$display("Moving register 6, check for binary 5");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b110, 16'b0000_0000_0000_0101);
+		#10
+		sim_readnum = 3'b101; //read register 5
+		#10
+		my_regfilemem_checker(16'b0000_0000_0000_0100); //checks the value in the last register assigned, not current write register
+		
+		
+		
+		//Register for 7, data_in 0
+		sim_clk = 1'b0; //clk off
+		sim_data_in = 16'b0000_0000_0000_0000 ; //0
+		sim_writenum = 3'b111 ; //write register 7
+		sim_write = 1'b1 ;// "on"
+		sim_readnum = 3'b111; //read register 7
+		#10
+		
+		$display("Moving register 7, check for binary 0");
+		sim_clk = 1'b1; //now something can happen;
+		#10;
+		my_regfile_checker(3'b111, 16'b0000_0000_0000_0000);
+		#10
+		sim_readnum = 3'b110; //read register 6
+		#10
+		my_regfilemem_checker(16'b0000_0000_0000_0101); //checks the value in the last register assigned, not current write register
+		
+		#10
+		sim_readnum = 3'b111; //read register 7
+		#10
+		my_regfilemem_checker(16'b0000_0000_0000_0000); //checks the value in the last register assigned, not current write register
+		
+		
+		
+		
+		
+		
+		if(~err) $display("PASSED"); //prints final "verdict" on testbench depends on err from task my_FSM_checker
+		else $display("FAILED");
+		
+		$stop;
+		
+	end
+	//still haven't really check what happens when we try to read a register we haven't just written to, I think it will hold the value
+	
+	
+endmodule
+
+
+
+
+
 module mux2_tb (); //regression test for the mux2 module
    reg [15:0] sim_a0;
    reg [15:0] sim_a1;
