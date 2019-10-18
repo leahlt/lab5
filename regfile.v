@@ -48,8 +48,22 @@ module mux2(a0, a1, s, b);
 endmodule
 
 
+//MUX with 4 16-bit inputs and one-hot select
+module mux4(a0, a1, a2, a3, s, b);
+	input [15:0] a0, a1, a2, a3;
+	input s;
+	output [15:0] b;
+		
+	assign b = ({16{s[0]}} & a0) | 
+				  ({16{s[1]}} & a1) |
+				  ({16{s[2]}} & a2) |
+				  ({16{s[3]}} & a3) ; //MUX logic, value s is concactinated 16 times to match bit size of inputs
+	
+endmodule
 
-//MUX with 5 16-bit inputs and 8-bit one-hot select
+
+
+//MUX with 8 16-bit inputs and 8-bit one-hot select
 module mux8(a0, a1, a2, a3, a4, a5, a6, a7, s, b);
 	input [15:0] a0, a1, a2, a3, a4, a5, a6, a7;
 	input [7:0] s;
@@ -78,12 +92,13 @@ endmodule
 
 //register with load enable
 module vDFFE(clk, en, in, out);
+	parameter n=1; //width
 	input clk, en;
-	input [15:0] in;
-	output [15:0] out;
+	input [n-1:0] in;
+	output [n-1:0] out;
 	
-	reg [15:0] out;
-	wire [15:0] next_out;
+	reg [n-1:0] out;
+	wire [n-1:0] next_out;
 	
 	assign next_out = en ? in : out; //mux (load enable part of this register)
 	
