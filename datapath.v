@@ -8,7 +8,7 @@ module datapath (clk,
 					  //added for lab 6
 					  mdata, PC, sximm8, sximm5,
 					  // outputs
-					  Z_out, datapath_out);
+					  Z, N, V, datapath_out);
 					  
   input [15:0] datapath_in, mdata, sximm8, sximm5;
   output [15:0] datapath_out;
@@ -16,7 +16,8 @@ module datapath (clk,
   input [2:0] readnum, writenum;
   input [1:0] shift, ALUop;
   input [7:0] PC;
-  output Z_out;
+  wire [2:0] Z_out;
+  output Z, N, V;
 
   wire [15:0] data_in, data_out, Aload, Bload, sout, Ain, Bin, out, sximm5;
   wire Z;
@@ -37,6 +38,10 @@ module datapath (clk,
   
   vDFFE mod5(clk, loadc, out, datapath_out);
   vDFFE mod10(clk, loads, Z, Z_out); //status register
+  
+  assign Z = Z_out[0];
+  assign N = Z_out[1];
+  assign V = Z_out[2];
   
 endmodule
 
