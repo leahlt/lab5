@@ -8,7 +8,7 @@ module ALU(Ain,Bin,ALUop,out,Z);
   assign out = result;
   assign Z[0] = ( result === 16'b0000_0000_0000_0000 );
   assign Z[1] = (result[15] === 1'b1);
-  assign Z[2] = (Ain[15] ~^ Bin{15}) & (Bin[15] ^ result[15]); //unsure if Bin[15] is the right way to see if these are signed xxx
+  assign Z[2] = (Ain[15] ~^ Bin[15]) & (Bin[15] ^ result[15]); //unsure if Bin[15] is the right way to see if these are signed xxx
   
   always @(*) begin
     case(ALUop)

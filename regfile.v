@@ -51,7 +51,7 @@ endmodule
 //MUX with 4 16-bit inputs and one-hot select
 module mux4(a0, a1, a2, a3, s, b);
 	input [15:0] a0, a1, a2, a3;
-	input s;
+	input [3:0] s;
 	output [15:0] b;
 		
 	assign b = ({16{s[0]}} & a0) | 

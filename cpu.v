@@ -21,10 +21,11 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w);
 	output N, V, Z, w;
 	
 	wire [15:0] instr, sximm8, sximm5;
-	wire [2:0] readnum, writenum, opcode;
+	wire [2:0] readnum, writenum, opcode, nsel;
 	wire [1:0] ALUop, shift, op;
+	wire loada, loadb, loadc, loads, write, asel, bsel, vsel;
 
-	vDFFE (#16) instruction(clk, load, in, instr); //instruction register
+	vDFFE #(16) instruction(clk, load, in, instr); //instruction register
 	
 	//if reset == 1 then FSM should go to reset state
 			//after this FSM should not do anything until s == 1 & poseedge clk
@@ -34,65 +35,45 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w);
 		//when the FSM is done, it should return here^
 
 	instruct_decoder ID (instr, // from instrucion vDDF
-				nsel, // still undefined
+				nsel, 
 				ALUop, sximm5, sximm8, shift,
 				readnum, writenum, op, opcode
-				)
+				);
 
-	datapath DP ( .clk         (~KEY[0]), // recall from Lab 4 that KEY0 is 1 when NOT pushed
-
-                // register operand fetch stage
-                .readnum     (readnum),
-                .vsel        (vsel),
-                .loada       (loada),
-                .loadb       (loadb),
-
-                // computation stage (sometimes called "execute")
-                .shift       (shift),
-                .asel        (asel),
-                .bsel        (bsel),
-                .ALUop       (ALUop),
-                .loadc       (loadc),
-                .loads       (loads),
-
-                // set when "writing back" to register file
-                .writenum    (writenum),
-                .write       (write),  
-                .datapath_in (datapath_in),
-                // added for lab 6
-                // These are still undefined
-                .mdata ({15{1'b0}}),
-                .PC ({8{1'b0}}),
-
-                sximm8, sximm5,
-
-
-                // outputs
-                .Z_out       (LEDR[9]),
-                .datapath_out(datapath_out)
-             );	
+	datapath DP (clk, 
+                 //register operand fetch stage
+                 readnum, vsel, loada, loadb, 
+                 // computation stage
+					  shift, asel, bsel, ALUop, loadc, loads, 
+					  // set when writing back to register file
+					  writenum, write, datapath_in, 
+					  //added for lab 6
+					  mdata, PC, sximm8, sximm5,
+					  // outputs
+					  Z, N, V, datapath_out);
+				 
+	controllerFSM con(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vsel, write, asel, bsel, loads);
 	
 endmodule
 
 
-module lap6_top();
-
-endmodule //currently, because of some confusion with the lab hand out this is NOT the top level, cpu is the top level for the project
 
 module instruct_decoder(Rd, nsel, ALUop, sximm5, sximm8, shift, readnum, writenum, op, opcode);
+	input [15:0] Rd;
+	input [2:0] nsel;
 	output [15:0] sximm8, sximm5;
 	output [2:0] readnum, writenum, opcode;
 	output [1:0] ALUop, shift, op;	
 
 	assign ALUop = Rd[12:11];
 
-	assign sximm5 = {11{Rd[4]},Rd[4:0]};
-	assign sximm8 = {8{Rd[7]},Rd[7:0]};
+	assign sximm5 = {{11{Rd[4]}},Rd[4:0]};
+	assign sximm8 = {{8{Rd[7]}},Rd[7:0]};
 
 	assign shift = Rd[4:3];
 
 	wire [2:0] writeReadNum;
-	mux3 (#3) muxR(Rd[10:8], Rd[7:5], Rm[2:0], nsel, writeReadNum);
+	mux3 #(3) muxR(Rd[10:8], Rd[7:5], Rd[2:0], nsel, writeReadNum);
 	assign readnum = writeReadNum;
 	assign writenum = writeReadNum;
 
@@ -109,25 +90,25 @@ module mux3(a2, a1, a0, s, b);
 
 	assign b = ({n{s[0]}} & a0) | 
 				  ({n{s[1]}} & a1) |
-				  ({n{s[2]}} & a2) |;
+				  ({n{s[2]}} & a2);
 
 endmodule
 
 
-module controllerFSM(s, reset, opcode, op, w, nsel, loada, loadb, loadc, vsel, write, asel, bsel, loads);
-	input s, reset;
+module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vsel, write, asel, bsel, loads);
+	input clk, s, reset;
 	input [2:0] opcode;
 	input [1:0] op;
-	output w, loada, loadb, loadc, write, asel, bsel, loads;
-	output [2:0] nsel;
-	output [3:0] vsel;
+	output reg w, loada, loadb, loadc, write, asel, bsel, loads;
+	output reg [2:0] nsel;
+	output reg [3:0] vsel;
 	
 	reg [5:0] present_state;
 	
 	
 	always @(posedge clk) begin
 		if (reset) begin
-			present_state = `waitState;
+			present_state <= `waitState;
 		end //if reset
 	
 	case(present_state)
@@ -171,63 +152,63 @@ module controllerFSM(s, reset, opcode, op, w, nsel, loada, loadb, loadc, vsel, w
 	
 	
 	case(present_state) //last case statement that sets outputs
-	`waitState: w=1;
+	`waitState: w<=1;
 	{`instruct1, `one}: begin 
-								nsel = 3'b001;
-								vsel = 4'b0100;
-								write = 1;
-								w = 0;
+								nsel <= 3'b001;
+								vsel <= 4'b0100;
+								write <= 1'b1;
+								w <= 1'b0;
 								end
 	{`instruct2, `one}: begin 
-								nsel = 3'b100;
-								write = 0;
-								asel = 1;
-								bsel = 0;
-								loadb = 1;
-								loadc = 1;
-								w = 0;
+								nsel <= 3'b100;
+								write <= 1'b0;
+								asel <= 1'b1;
+								bsel <= 1'b0;
+								loadb <= 1'b1;
+								loadc <= 1'b1;
+								w <= 1'b0;
 								end
 	{`instruct2, `two}: begin 
-								nsel = 3'b010;
-								vsel = 4'b0001;
-								write = 1;
-								loadc = 0;
-								w = 0;
+								nsel <= 3'b010;
+								vsel <= 4'b0001;
+								write <= 1'b1;
+								loadc <= 1'b0;
+								w <= 1'b0;
 								end
 	{`instruct3, `one}: begin 
-								nsel = 3'b001;
-								write = 0;
-								loada=1;
-								w = 0;
+								nsel <= 3'b001;
+								write <= 1'b0;
+								loada<= 1'b1;
+								w <= 1'b0;
 								end
 	{`instruct3, `two}: begin 
-								nsel = 3'b100;
-								asel = 0;
-								bsel = 0;
-								loadb = 1;
-								loadc = 1;
-								w = 0;
+								nsel <= 3'b100;
+								asel <= 1'b0;
+								bsel <= 1'b0;
+								loadb <= 1'b1;
+								loadc <= 1'b1;
+								w <= 1'b0;
 								end
 	{`instruct3, `three}: begin 
-								nsel = 3'b010;
-								vsel = 4'b0001;
-								write = 1;
-								loadc = 0;
-								w = 0;
+								nsel <= 3'b010;
+								vsel <= 4'b0001;
+								write <= 1'b1;
+								loadc <= 1'b0;
+								w <= 1'b0;
 								end
 	{`instruct4, `one}: begin 
-								nsel = 3'b001;
-								write = 0;
-								loada = 1;
-								w = 0;
+								nsel <= 3'b001;
+								write <= 1'b0;
+								loada <= 1'b1;
+								w <= 1'b0;
 								end
 	{`instruct4, `two}: begin 
-								nsel = 3'b100;
-								loadb = 1;
-								loads = 1;
-								asel = 0;
-								bsel = 0;
-								w = 0;
+								nsel <= 3'b100;
+								loadb <= 1'b1;
+								loads <= 1'b1;
+								asel <= 1'b0;
+								bsel <= 1'b0;
+								w <= 1'b0;
 								end
 	
 	endcase
