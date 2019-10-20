@@ -95,7 +95,7 @@ endmodule
 
 module sseg(in,segs);
   input [3:0] in;
-  output reg [6:0] segs;
+  output [6:0] segs;
 
   // NOTE: The code for sseg below is not complete: You can use your code from
   // Lab4 to fill this in or code from someone else's Lab4.  
@@ -142,9 +142,7 @@ module sseg(in,segs);
   //            14 | E
   //            15 | F
 
-  //assign segs = 7'b0001110;  // this will output "F" 
-
-    always @(*) begin
+  always @(*) begin
   case(in)
 		4'b0000: segs = 7'b1000000;  // this will output "0"
 		4'b0001: segs = 7'b1111001;  // this will output "1" 
