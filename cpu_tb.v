@@ -186,7 +186,7 @@ module cpu_tb ();
   $display("TEST 1");
 
   //Test 1
-  in = 16'b10100_010_001_00_000; // reg 2 + reg 0 = 8 + 4 = 12 in reg 1
+  in = 16'b10100_010_001_00_001; // reg 2 + reg 1 = 8 + 4 = 12 in reg 1
   
    #10;
   s = 1;
@@ -211,7 +211,7 @@ module cpu_tb ();
   
   //Test 3
   $display("TEST 3");
-  in = 16'b10100_010_111_01_000; // reg 2 + reg 0 * 2 = 8 + 8 = 16 in reg 7   
+  in = 16'b10100_010_111_00_000; // reg 2 + reg 0 * 2 = 8 + 8 = 16 in reg 7   
   
    #10;
   s = 1;
@@ -225,7 +225,7 @@ module cpu_tb ();
   $display("-----Now testing instruction 4");
   $display("TEST 1");
   //Test 1
-  in = 16'b10101_000_010_00_111; // reg 2 - reg 7 = 8 - 16 = -8
+  in = 16'b10101_000_010_01_111; // reg 2 - reg 7 * 2 = 8 - 16 = -8
   
    #10;
   s = 1;
@@ -238,7 +238,7 @@ module cpu_tb ();
   
   //Test 2
   $display("TEST 2");
-  in = 16'b10101_000_010_10_111; // reg 2 - reg 7 / 2 = 8 - 8 = 0 
+  in = 16'b10101_000_010_00_111; // reg 2 - reg 7 = 8 - 8 = 0 
   
   
    #10;

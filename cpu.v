@@ -164,7 +164,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	always @(*) begin
 	
 	case(present_state) //last case statement that sets outputs
-	//`waitState: w<=1'b1;
+	`waitState: write <= 1'b0;
 	{`instruct1, `one}: begin 
 								nsel <= 3'b001;
 								vsel <= 4'b0100;
@@ -202,7 +202,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								loadc <= 1'b1;
 							//	w <= 1'b0;
 								end
-	{`instruct3, `three}: begin 
+	{`instruct3, `four}: begin 
 								nsel <= 3'b010;
 								vsel <= 4'b0001;
 								write <= 1'b1;
@@ -218,6 +218,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	{`instruct4, `two}: begin 
 								nsel <= 3'b100;
 								loadb <= 1'b1;
+								loada <= 1'b0;
 								loads <= 1'b1;
 								asel <= 1'b0;
 								bsel <= 1'b0;
