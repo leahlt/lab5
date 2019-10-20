@@ -16,7 +16,7 @@
 
 
 
-module cpu(clk, reset, s, load, in, out, N, V, Z, w);
+module cpu(clk, reset, s, load, in, out, N, V, Z, w); //top level module
 	input clk, reset, s, load;
 	input [15:0] in;
 	output [15:0] out;
@@ -30,6 +30,7 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w);
 
 	vDFFE #(16) instruction(clk, load, in, instr); //instruction register
 	
+	//OVERVIEW OF BEHAVIOR
 	//if reset == 1 then FSM should go to reset state
 			//after this FSM should not do anything until s == 1 & poseedge clk
 	//out is dataout from datapath
@@ -41,7 +42,7 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w);
 				nsel, 
 				ALUop, sximm5, sximm8, shift,
 				readnum, writenum, op, opcode
-				);
+				); //instruction decoder, depends on cpu inputs, instrution register, and FSM outputs
 
 	datapath DP (clk, 
                  //register operand fetch stage
@@ -53,11 +54,11 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w);
 					  //added for lab 6
 					  mdata, PC, sximm8, sximm5,
 					  // outputs
-					  Z, N, V, datapath_out);
+					  Z, N, V, datapath_out); //accesses editted module from lab5 - does the mathematical operations and read/writes from registers
 				 
 	controllerFSM con(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vsel, write, asel, bsel, loads);
-	
-endmodule
+	//runs the finite state machine which will control the decoder and the datapath
+endmodule //cpu
 
 
 
@@ -68,20 +69,20 @@ module instruct_decoder(Rd, nsel, ALUop, sximm5, sximm8, shift, readnum, writenu
 	output [2:0] readnum, writenum, opcode;
 	output [1:0] ALUop, shift, op;	
 
-	assign ALUop = Rd[12:11];
+	assign ALUop = Rd[12:11]; //parses ALU instruction from input
 
-	assign sximm5 = {{11{Rd[4]}},Rd[4:0]};
-	assign sximm8 = {{8{Rd[7]}},Rd[7:0]};
+	assign sximm5 = {{11{Rd[4]}},Rd[4:0]}; //sign extension for 5 bit
+	assign sximm8 = {{8{Rd[7]}},Rd[7:0]}; //sign extension for 8 bit
 
-	assign shift = Rd[4:3];
+	assign shift = Rd[4:3]; //parse shift instruction
 
 	wire [2:0] writeReadNum;
 	mux3 #(3) muxR(Rd[2:0], Rd[7:5], Rd[10:8], nsel, writeReadNum);
-	assign readnum = writeReadNum;
-	assign writenum = writeReadNum;
+	assign readnum = writeReadNum; //assign result of mux3 to readnum
+	assign writenum = writeReadNum; //^ also to write num, because they are the same in lab6 and onward
 
-	assign op = Rd[12:11];
-	assign opcode = Rd[15:13];
+	assign op = Rd[12:11]; //parse op
+	assign opcode = Rd[15:13]; //parse opcode
 
 endmodule
 
@@ -91,7 +92,7 @@ module mux3(a2, a1, a0, s, b);
 	input [2:0] s;
 	output [n-1:0] b;
 
-	assign b = ({n{s[0]}} & a0) | 
+	assign b = ({n{s[0]}} & a0) | //mux logic, chooses one of a0, a1, or a2
 				  ({n{s[1]}} & a1) |
 				  ({n{s[2]}} & a2);
 
@@ -110,15 +111,15 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	reg [5:0] present_state;
 	
 	
-	always @(posedge clk) begin
-		if (reset) begin
-			present_state <= `waitState;
+	always @(posedge clk) begin //always block that runs the meat of the FSM (changes states), sensitivty is at rising edge of the clk
+		if (reset) begin //check for reset
+			present_state <= `waitState; //move to reset aka waitState if it is high
 		end //if reset
 	
 	case(present_state)
-		`waitState: if (s) begin
+		`waitState: if (s) begin //only leave waitState if start is 1
 			case({opcode,op}) //case to move into the right instruction set
-				5'b11010: present_state <= {`instruct1, `one};
+				5'b11010: present_state <= {`instruct1, `one}; //instruction one moves
 				5'b11000: present_state <= {`instruct2, `one};
 				5'b10100: present_state <= {`instruct3, `one};
 				5'b10101: present_state <= {`instruct4, `one};
@@ -161,7 +162,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	
 	end
 	
-	always @(*) begin
+	always @(*) begin //always block that sets the output for the states of the FSM, runs whenever something changes
 	
 	case(present_state) //last case statement that sets outputs
 	`waitState: write <= 1'b0;
@@ -224,12 +225,24 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								bsel <= 1'b0;
 							//	w <= 1'b0;
 								end
+	default: begin
+				nsel <= 3'bxxx;
+				vsel <= 4'bxxxx;
+				loada = 1'bx;
+				loadb = 1'bx;
+				loadc = 1'bx;
+				loads = 1'bx;
+				asel <= 1'bx;
+				bsel <= 1'bx;
+				write <= 1'bx;
+			end
+
 	
 	endcase
 	
 	end
 	
-	assign w = ( present_state === `waitState );
+	assign w = ( present_state === `waitState ); //controls the wait variable... aka sets w to one whenever we are in the waitState
 	
 endmodule
 
