@@ -261,11 +261,11 @@ module cpu_tb ();
   								 // This will turn to binary 0111_1111_1111_1111 (MAX_INTEGER)
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
-  in = 16'b11010_110_1111_0111; // Load -8 to reg 5 
+  in = 16'b11010_110_1111_0111; // Load -8 to reg 6 
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
 
-  in = 16'b10101_110_000_00_100; // reg 5 - reg 4 = -8 - MAX_INTEGER = 7
+  in = 16'b10101_110_000_00_100; // reg 6 - reg 4 = -8 - MAX_INTEGER = 7
 
   								 // 1111_1111_1111_0111 this is -8
   								 // 1000_0000_0000_0001 this is flipping the MAX_INTEGER
@@ -285,7 +285,7 @@ module cpu_tb ();
   
   //Test 1
   $display("TEST 1");
-  in = 16'b10110_111_100_00_010; // reg 4 & reg 2 = 0111_1111_1111_1111 && 0000_0000_0000_0100
+  in = 16'b10110_100_111_00_010; // reg 4 & reg 2 = 0111_1111_1111_1111 && 0000_0000_0000_0100
   								 // result is 8 to reg 7
   
    #10;
@@ -299,7 +299,7 @@ module cpu_tb ();
   
   //Test 2
   $display("TEST 2");
-  in = 16'b10110_111_010_10_010; // reg 2 & reg 2 shift left = 0 to reg 7
+  in = 16'b10110_010_111_10_010; // reg 2 & reg 2 shift left = 0 to reg 7
   
    #10;
   s = 1;
@@ -311,7 +311,7 @@ module cpu_tb ();
   
   //Test 3
   $display("TEST 3");
-  in = 16'b10110_110_100_00_100; // Load reg 4 & reg 4 = reg 4 to reg 7
+  in = 16'b10110_100_111_00_100; // Load reg 4 & reg 4 = reg 4 to reg 7
   
    #10;
   s = 1;
@@ -328,7 +328,7 @@ module cpu_tb ();
   
   //Test 1
   $display("TEST 1");
-  in = 16'b10110_000_111_00_010; // Load ~reg 2 = 1111_1111_1111_0111 to reg 7
+  in = 16'b10111_000_111_00_010; // Load ~reg 2 = 1111_1111_1111_0111 to reg 7
   
    #10;
   s = 1;
@@ -337,11 +337,11 @@ module cpu_tb ();
    
    #10;
   
-  reg0check( {{8{1'b1}}, 8'b1111_0111} );
+  reg7check( {{8{1'b1}}, 8'b1111_0111} );
   
   //Test 2
   $display("TEST 2");
-  in = 16'b10110_000_000_01_100; // ~(reg 4 shift left) = 1111_1111_1111_1110 to reg 0
+  in = 16'b10111_000_000_01_100; // ~(reg 4 shift left) = 1111_1111_1111_1110 to reg 0
   
    #10;
   s = 1;
@@ -349,11 +349,11 @@ module cpu_tb ();
   s <= 0;
    
    #10;
-  reg0check( {{15{1'b1}}, 1'b0} );
+  reg0check( {{15{1'b0}}, 1'b1} );
   
   //Test 3
   $display("TEST 3");
-  in = 16'b10110_000_001_11_000; // ~(reg 0 shift left MSB = 1) = all 0 to reg 1 
+  in = 16'b11000_000_001_11_000; // (reg 0 shift left MSB = 0) = all 0 to reg 1 
   
   
    #10;
@@ -367,13 +367,14 @@ module cpu_tb ();
 
 
   //Test NOT and Status overflow
-  $display("Special tests");
-  in = 16'b10111_000_110_00_100; // ~reg 4 to reg 5
+  $display("---Special tests");
+  $display("TEST 1");
+  in = 16'b10111_000_110_00_100; // ~reg 4 to reg 6
   								 // This is the MIN_INTEGER = 1000_0000_0000_0000
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
 
-  in = 16'b10101_000_110_00_100; // reg 5 - reg 4 = MIN_INTEGER - MAX_INTEGER 
+  in = 16'b10101_110_000_00_100; // reg 6 - reg 4 = MIN_INTEGER - MAX_INTEGER 
 
   								 // 1000_0000_0000_0000 this is MIN_INTEGER
   								 // 0111_1111_1111_1111 this is MAX_INTEGER
@@ -385,20 +386,23 @@ module cpu_tb ();
   @(posedge clk)
   s <= 0;
   
+  #10
   statuscheck( 0, 0, 1);
 
 
   //Test 2
-  in = 16'b10111_000_110_00_100; // ~reg 4 to reg 5
+  $display("TEST 2");
+  in = 16'b10111_000_110_00_100; // ~reg 4 to reg 6
   								 // This is the MIN_INTEGER = 1000_0000_0000_0000
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
 
-  in = 16'b10101_000_110_00_100; // reg 5 - reg 4 = MAX_INTEGER - MIN_INTEGER 
+  in = 16'b10101_000_110_00_100; // reg 0 - reg 4 = 0 - MIN_INTEGER 
 
-  								 // 0111_1111_1111_1111 this is MAX_INTEGER
-  								 // 1000_0000_0000_0000 this is NEGATIVE MIN_INTEGER
-  								 // 1111_1111_1111_1111 resulting in NEGATIVE 1
+  								 // 1000_0000_0000_0000 this is MIN_INTEGER
+  								 // 1000_0000_0000_0000 this is NEGATIVE of MIN_INTEGER
+								 // 0 - MIN_INTEGER = 0 + MIN_INTEGER = MIN_INTEGER
+  								 // 1000_0000_0000_0000 resulting in MIN_INTEGER
    #10;
   s = 1;
   @(posedge clk)
