@@ -12,6 +12,7 @@
 `define two 3'b001
 `define three 3'b010
 `define four 3'b011
+`define five 3'b100
 
 
 
@@ -145,12 +146,14 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 							`one: present_state[2:0] <= `two;
 							`two: present_state[2:0] <= `three;
 							`three: present_state[2:0] <= `four;
-							`four: present_state <= `waitState;
+							`four: present_state[2:0] <= `five;
+							`five: present_state <= `waitState;
 							default: present_state[2:0] <= 3'bxxx;	
 						endcase 
 		`instruct4: case(present_state [2:0])
 							`one: present_state[2:0] <= `two;
-							`two: present_state <= `waitState;
+							`two: present_state[2:0] <= `three;
+							`three: present_state <= `waitState;
 							default: present_state[2:0] <= 3'bxxx;
 						endcase 
 						
