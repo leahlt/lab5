@@ -22,7 +22,7 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w); //top level module
 	output [15:0] out;
 	output N, V, Z, w;
 	
-	wire [15:0] instr, sximm8, sximm5, datapath_out;
+	wire [15:0] instr, sximm8, sximm5;
 	wire [3:0] vsel;
 	wire [2:0] readnum, writenum, opcode, nsel;
 	wire [1:0] ALUop, shift, op;
@@ -54,7 +54,7 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w); //top level module
 					  //added for lab 6
 					  mdata, PC, sximm8, sximm5,
 					  // outputs
-					  Z, N, V, datapath_out); //accesses editted module from lab5 - does the mathematical operations and read/writes from registers
+					  Z, N, V, out); //accesses editted module from lab5 - does the mathematical operations and read/writes from registers
 				 
 	controllerFSM con(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vsel, write, asel, bsel, loads);
 	//runs the finite state machine which will control the decoder and the datapath
@@ -168,7 +168,16 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	always @(*) begin //always block that sets the output for the states of the FSM, runs whenever something changes
 	
 	case(present_state) //last case statement that sets outputs
-	`waitState: write <= 1'b0;
+	`waitState: begin write <= 1'b0;
+				nsel <= 3'b000;
+				vsel <= 4'b0000;
+				loada = 1'b0;
+				loadb = 1'b0;
+				loadc = 1'b0;
+				loads = 1'b0;
+				asel <= 1'b0;
+				bsel <= 1'b0;
+					 end
 	{`instruct1, `one}: begin 
 								nsel <= 3'b001;
 								vsel <= 4'b0100;
@@ -184,7 +193,23 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								loadc <= 1'b1;
 							//	w <= 1'b0;
 								end
+	{`instruct2, `two}: begin 
+								nsel <= 3'b100;
+								write <= 1'b0;
+								asel <= 1'b1;
+								bsel <= 1'b0;
+								loadb <= 1'b1;
+								loadc <= 1'b1;
+							//	w <= 1'b0;
+								end
 	{`instruct2, `three}: begin 
+								nsel <= 3'b010;
+								vsel <= 4'b0001;
+								write <= 1'b1;
+								loadc <= 1'b0;
+							//	w <= 1'b0;
+								end
+	{`instruct2, `four}: begin 
 								nsel <= 3'b010;
 								vsel <= 4'b0001;
 								write <= 1'b1;
@@ -198,6 +223,15 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 							//	w <= 1'b0;
 								end
 	{`instruct3, `two}: begin 
+								nsel <= 3'b100;
+								asel <= 1'b0;
+								bsel <= 1'b0;
+								loada <= 1'b0;
+								loadb <= 1'b1;
+								loadc <= 1'b1;
+							//	w <= 1'b0;
+								end
+	{`instruct3, `three}: begin 
 								nsel <= 3'b100;
 								asel <= 1'b0;
 								bsel <= 1'b0;

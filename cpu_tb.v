@@ -397,7 +397,7 @@ module cpu_tb ();
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
 
-  in = 16'b10101_000_110_00_100; // reg 0 - reg 4 = 0 - MIN_INTEGER 
+  in = 16'b10101_000_110_00_110; // reg 0 - reg 4 = 0 - MIN_INTEGER 
 
   								 // 1000_0000_0000_0000 this is MIN_INTEGER
   								 // 1000_0000_0000_0000 this is NEGATIVE of MIN_INTEGER
@@ -408,6 +408,7 @@ module cpu_tb ();
   @(posedge clk)
   s <= 0;
   
+#10;
   statuscheck( 0, 1, 1);
 
   $stop;
