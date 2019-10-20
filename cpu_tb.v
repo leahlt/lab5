@@ -1,19 +1,18 @@
 module cpu_tb ();
 
 	reg [15:0] in;
-	reg clk, reset, s, load;
+	reg clk, reset, s, load, err;
 	wire [15:0] out;
 	wire N, V, Z, w;
 	
 	cpu DUT(clk, reset, s, load, in, out, N, V, Z, w);
 	
   task outputcheck;
-  input [15:0] out;
-  input zout;
+  input [15:0] outx;
     begin
-	   if( out !== datapath_out ) begin
+	   if( out !== outx ) begin
 	     err = 1'b1;
-		  $display("Data error data out is %b, expected %b", datapath_out, out);
+		  $display("Data error data out is %b, expected %b", out, outx);
 		end
     end
   endtask
@@ -43,6 +42,7 @@ module cpu_tb ();
 	     err = 1'b1;
 		  $display("Regfile error R0 is %b, expected %b", cpu_tb.DUT.DP.REGFILE.R0, regfile0);
 		end  
+		end
   endtask
   
   task reg1check;
@@ -52,6 +52,7 @@ module cpu_tb ();
 	     err = 1'b1;
 		  $display("Regfile error R1 is %b, expected %b", cpu_tb.DUT.DP.REGFILE.R1, regfile);
 		end  
+		end
   endtask
     
   task reg7check;
@@ -61,56 +62,73 @@ module cpu_tb ();
 	     err = 1'b1;
 		  $display("Regfile error R7 is %b, expected %b", cpu_tb.DUT.DP.REGFILE.R7, regfile);
 		end  
+		end
   endtask
   
-  initial begin
-	 forever begin
+  initial forever begin
 	   clk = 0; 
 		#1
 		clk = 1;
 		#1;
     end
-  end
   
   initial begin
   
-  reset = 0;
+  reset = 1;
+  err = 0;
   
+   #10;
+  
+  reset = 0;
   //------Instruction 1----------//
   
   // Test 1
   in = 16'b11010_000_0110_1001; // Load a random positive number in register 0
   load = 1;
   
-  #5
+   #10
   
-  load = 0;
   s = 1;
   
-  #5
+  @(posedge clk)
+  s <= 0;
   
-  reg0check( {8{1'b0}, 8'b0110_1001} );
+   
+   #10;
+  
+  reg0check( {{8{1'b0}}, 8'b0110_1001} );
+  
   
   //Test 2
   
   in = 16'b11010_000_1100_1010; // Load a random negative number in register 0
   load = 1;
+    
+   #10;
   
-  #5
+  s = 1;
+  @(posedge clk)
+  s <= 0;
+  
+
+   #10
   
   load = 0;
   in = 16'b11010_010_0000_1000; // Load 8 in register 2 for test 3
   
-  #5
+   #10
   
-  reg0check( {8{1'b1}, 8'b1100_1010} );
+  reg0check( {{8{1'b1}}, 8'b1100_1010} );
   
   //Test 3
   
   load = 1;
+  s = 1;
+  @(posedge clk)
+  s <= 0;
   
-  #5
-  
+   
+   #10;
   //No need to change in because we have changed it before
   
   if (  cpu_tb.DUT.DP.REGFILE.R2 !== 16'b0000_0000_0000_1000 ) begin
@@ -122,24 +140,40 @@ module cpu_tb ();
   
   //Test 1
   in = 16'b11000_000_000_00_010; // Load reg 2 = 8 in reg 0
-
-  #5
   
-  reg0check( {8{1'b0}, 8'b0000_1000 );
+   #10;
+  s = 1;
+  @(posedge clk)
+  s <= 0;
+   
+   #10;
+  
+  reg0check( {{8{1'b0}}, 8'b0000_1000} );
   
   //Test 2
   in = 16'b11000_011_001_10_000; // Load reg 0 shift left = 8 / 2 = 4 in reg 1
   
-  #5
   
-  reg1check( {8{1'b)}, 8'b0000_0100 );
+   #10;
+  s = 1;
+  @(posedge clk)
+  s <= 0;
+   
+   #10;
+  reg1check( {{8{1'b0}}, 8'b0000_0100} );
   
   //Test 3
   in = 16'b11000_011_111_01_001; // Load reg 1 shift right = 4 * 2 = 8 in reg 7
   
-  #5
   
-  reg7check( {8{1'b0}, 8'b0000_1000 );
+   #10;
+  s = 1;
+  @(posedge clk)
+  s <= 0;
+  
+  
+   #10;
+  reg7check( {{8{1'b0}}, 8'b0000_1000} );
   
   $stop;
   end

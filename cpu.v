@@ -11,6 +11,7 @@
 `define one 3'b000
 `define two 3'b001
 `define three 3'b010
+`define four 3'b011
 
 
 
@@ -20,10 +21,11 @@ module cpu(clk, reset, s, load, in, out, N, V, Z, w);
 	output [15:0] out;
 	output N, V, Z, w;
 	
-	wire [15:0] instr, sximm8, sximm5;
+	wire [15:0] instr, sximm8, sximm5, datapath_out;
+	wire [3:0] vsel;
 	wire [2:0] readnum, writenum, opcode, nsel;
 	wire [1:0] ALUop, shift, op;
-	wire loada, loadb, loadc, loads, write, asel, bsel, vsel;
+	wire loada, loadb, loadc, loads, write, asel, bsel;
 
 	vDFFE #(16) instruction(clk, load, in, instr); //instruction register
 	
@@ -73,7 +75,7 @@ module instruct_decoder(Rd, nsel, ALUop, sximm5, sximm8, shift, readnum, writenu
 	assign shift = Rd[4:3];
 
 	wire [2:0] writeReadNum;
-	mux3 #(3) muxR(Rd[10:8], Rd[7:5], Rd[2:0], nsel, writeReadNum);
+	mux3 #(3) muxR(Rd[2:0], Rd[7:5], Rd[10:8], nsel, writeReadNum);
 	assign readnum = writeReadNum;
 	assign writenum = writeReadNum;
 
@@ -86,7 +88,7 @@ module mux3(a2, a1, a0, s, b);
 	parameter n=3;
 	input [n-1:0] a2, a1, a0;
 	input [2:0] s;
-	output b;
+	output [n-1:0] b;
 
 	assign b = ({n{s[0]}} & a0) | 
 				  ({n{s[1]}} & a1) |
@@ -99,9 +101,10 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	input clk, s, reset;
 	input [2:0] opcode;
 	input [1:0] op;
-	output reg w, loada, loadb, loadc, write, asel, bsel, loads;
+	output reg loada, loadb, loadc, write, asel, bsel, loads;
 	output reg [2:0] nsel;
 	output reg [3:0] vsel;
+	output w;
 	
 	reg [5:0] present_state;
 	
@@ -133,13 +136,16 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 						endcase //present_state step
 		`instruct2: case(present_state [2:0]) //also instruction 6
 							`one: present_state[2:0] <= `two;
-							`two: present_state <= `waitState;
+							`two: present_state[2:0] <= `three;
+							`three: present_state[2:0] <= `four;
+							`four: present_state <= `waitState;
 							default: present_state[2:0] <= 3'bxxx;
 						endcase 
 		`instruct3: case(present_state [2:0]) //also instruction 5
 							`one: present_state[2:0] <= `two;
-							`two: present_state <= `three;
-							`three: present_state <= `waitState;
+							`two: present_state[2:0] <= `three;
+							`three: present_state[2:0] <= `four;
+							`four: present_state <= `waitState;
 							default: present_state[2:0] <= 3'bxxx;	
 						endcase 
 		`instruct4: case(present_state [2:0])
@@ -150,14 +156,17 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 						
 	endcase //present_state instruction
 	
+	end
+	
+	always @(*) begin
 	
 	case(present_state) //last case statement that sets outputs
-	`waitState: w<=1;
+	//`waitState: w<=1'b1;
 	{`instruct1, `one}: begin 
 								nsel <= 3'b001;
 								vsel <= 4'b0100;
 								write <= 1'b1;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	{`instruct2, `one}: begin 
 								nsel <= 3'b100;
@@ -166,41 +175,42 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								bsel <= 1'b0;
 								loadb <= 1'b1;
 								loadc <= 1'b1;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
-	{`instruct2, `two}: begin 
+	{`instruct2, `three}: begin 
 								nsel <= 3'b010;
 								vsel <= 4'b0001;
 								write <= 1'b1;
 								loadc <= 1'b0;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	{`instruct3, `one}: begin 
 								nsel <= 3'b001;
 								write <= 1'b0;
 								loada<= 1'b1;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	{`instruct3, `two}: begin 
 								nsel <= 3'b100;
 								asel <= 1'b0;
 								bsel <= 1'b0;
+								loada <= 1'b0;
 								loadb <= 1'b1;
 								loadc <= 1'b1;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	{`instruct3, `three}: begin 
 								nsel <= 3'b010;
 								vsel <= 4'b0001;
 								write <= 1'b1;
 								loadc <= 1'b0;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	{`instruct4, `one}: begin 
 								nsel <= 3'b001;
 								write <= 1'b0;
 								loada <= 1'b1;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	{`instruct4, `two}: begin 
 								nsel <= 3'b100;
@@ -208,14 +218,15 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								loads <= 1'b1;
 								asel <= 1'b0;
 								bsel <= 1'b0;
-								w <= 1'b0;
+							//	w <= 1'b0;
 								end
 	
 	endcase
 	
-
+	end
 	
-	end //always block
+	assign w = ( present_state === `waitState );
+	
 endmodule
 
 

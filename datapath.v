@@ -27,8 +27,8 @@ module datapath (clk,
   
   regfile REGFILE(data_in, writenum, write, readnum, clk, data_out);
   
-  vDFFE mod3(clk, loada, data_out, Aload);
-  vDFFE mod4(clk, loadb, data_out, Bload);
+  vDFFE #(16) mod3(clk, loada, data_out, Aload);
+  vDFFE #(16) mod4(clk, loadb, data_out, Bload);
   
   mux2 mod6(Aload, 16'b0000_0000_0000_0000, asel, Ain);
   mux2 mod7(sout, sximm5, bsel, Bin);
@@ -37,7 +37,7 @@ module datapath (clk,
   
   ALU U2(Ain,Bin,ALUop,out,Zal);
   
-  vDFFE mod5(clk, loadc, out, datapath_out);
+  vDFFE #(16) mod5(clk, loadc, out, datapath_out);
   vDFFE #(3) mod10(clk, loads, Zal, Z_out); //status register
   
   assign Z = Z_out[0];

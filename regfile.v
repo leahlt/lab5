@@ -20,14 +20,14 @@ module regfile(data_in, writenum, write, readnum, clk, data_out);
 	decoder38a writex(writenum, hot_writenum);
    decoder38a readx(readnum, hot_readnum);
 
-	vDFFE r0(clk, en0, data_in, R0);
-	vDFFE r1(clk, en1, data_in, R1);
-	vDFFE r2(clk, en2, data_in, R2);
-	vDFFE r3(clk, en3, data_in, R3);
-	vDFFE r4(clk, en4, data_in, R4);
-	vDFFE r5(clk, en5, data_in, R5);
-	vDFFE r6(clk, en6, data_in, R6);
-	vDFFE r7(clk, en7, data_in, R7);
+	vDFFE #(16) r0(clk, en0, data_in, R0);
+	vDFFE #(16) r1(clk, en1, data_in, R1);
+	vDFFE #(16) r2(clk, en2, data_in, R2);
+	vDFFE #(16) r3(clk, en3, data_in, R3);
+	vDFFE #(16) r4(clk, en4, data_in, R4);
+	vDFFE #(16) r5(clk, en5, data_in, R5);
+	vDFFE #(16) r6(clk, en6, data_in, R6);
+	vDFFE #(16) r7(clk, en7, data_in, R7);
 	
    mux8 outx(R0, R1, R2, R3, R4, R5, R6, R7, hot_readnum, data_out);
 
