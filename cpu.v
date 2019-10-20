@@ -127,7 +127,8 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 				5'b10111: present_state <= {`instruct6, `one};
 				default: present_state <= 6'bxxx_xxx;
 			endcase //waitstate
-		end		
+		end
+		default: present_state <= 6'bxxxxxx;		
 	endcase
 
 
@@ -157,6 +158,8 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 							`three: present_state <= `waitState;
 							default: present_state[2:0] <= 3'bxxx;
 						endcase 
+
+		default: present_state <= 6'bxxxxxx;
 						
 	endcase //present_state instruction
 	
