@@ -9,7 +9,7 @@ module ALU(Ain,Bin,ALUop,out,Z);
   assign Z[0] = ( result === 16'b0000_0000_0000_0000 );
   assign Z[1] = (result[15] === 1'b1);
   assign Z[2] = ( ((Ain[15] ~^ Bin[15]) & (Bin[15] ^ result[15]) & ~ALUop[0] ) 
-                | ((Ain[15] ^ Bin[15]) & ~result[15] & ALUop[0])); //unsure if overflow matters in op 10 and op 11
+                | ((Ain[15] ^ Bin[15]) & (Bin[15] == result[15]) & ALUop[0])); //unsure if overflow matters in op 10 and op 11
   
   always @(*) begin
     case(ALUop)
