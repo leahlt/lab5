@@ -221,11 +221,11 @@ module cpu_tb ();
    #10;
   reg7check( {{8{1'b0}}, 8'b0001_0000} );
 
-  //------Instruction 4----------//
+  //------Instruction 4----------// reg 7 = 16
   $display("-----Now testing instruction 4");
   $display("TEST 1");
   //Test 1
-  in = 16'b10101_000_010_01_111; // reg 2 - reg 7 * 2 = 8 - 16 = -8
+  in = 16'b10101_000_010_01_111; // reg 2 - reg 7 * 2 = 8 - 32 = -number
   
    #10;
   s = 1;
@@ -238,7 +238,7 @@ module cpu_tb ();
   
   //Test 2
   $display("TEST 2");
-  in = 16'b10101_000_010_00_111; // reg 2 - reg 7 = 8 - 8 = 0 
+  in = 16'b10101_000_010_10_111; // reg 2 - reg 7 / 2 = 8 - 8 = 0 
   
   
    #10;
