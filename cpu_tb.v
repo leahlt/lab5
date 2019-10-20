@@ -225,7 +225,7 @@ module cpu_tb ();
   $display("-----Now testing instruction 4");
   $display("TEST 1");
   //Test 1
-  in = 16'b10101_000_010_01_111; // reg 2 - reg 7 * 2 = 8 - 32 = -number
+  in = 16'b10101_010_000_01_111; // reg 2 - reg 7 * 2 = 8 - 32 = -number
   
    #10;
   s = 1;
@@ -238,7 +238,7 @@ module cpu_tb ();
   
   //Test 2
   $display("TEST 2");
-  in = 16'b10101_000_010_10_111; // reg 2 - reg 7 / 2 = 8 - 8 = 0 
+  in = 16'b10101_010_000_10_111; // reg 2 - reg 7 / 2 = 8 - 8 = 0 
   
   
    #10;
@@ -265,7 +265,7 @@ module cpu_tb ();
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
 
-  in = 16'b10101_000_110_00_100; // reg 5 - reg 4 = -8 - MAX_INTEGER = 7
+  in = 16'b10101_110_000_00_100; // reg 5 - reg 4 = -8 - MAX_INTEGER = 7
 
   								 // 1111_1111_1111_0111 this is -8
   								 // 1000_0000_0000_0001 this is flipping the MAX_INTEGER
