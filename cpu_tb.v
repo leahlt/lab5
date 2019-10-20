@@ -278,7 +278,7 @@ module cpu_tb ();
   
    #10;
 
-  statuscheck( 0, 1, 1 );
+  statuscheck( 0, 0, 1 );
   
   //------Instruction 5----------//
   $display("-----Now testing instruction 5");
