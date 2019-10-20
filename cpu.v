@@ -119,16 +119,16 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	case(present_state)
 		`waitState: if (s) begin //only leave waitState if start is 1
 			case({opcode,op}) //case to move into the right instruction set
-				5'b11010: present_state <= {`instruct1, `one}; //instruction one moves
-				5'b11000: present_state <= {`instruct2, `one};
-				5'b10100: present_state <= {`instruct3, `one};
-				5'b10101: present_state <= {`instruct4, `one};
-				5'b10110: present_state <= {`instruct5, `one};
-				5'b10111: present_state <= {`instruct6, `one};
+				5'b11010: present_state <= {`instruct1, `one}; //instruction one moves to regsiter Rd sign extend
+				5'b11000: present_state <= {`instruct2, `one}; //instruction two moves to Rd and shift
+				5'b10100: present_state <= {`instruct3, `one}; //instrution 3 Adds Rn to shifted Rm into Rd
+				5'b10101: present_state <= {`instruct4, `one}; //instruction 4 status of Rn - shfited Rm
+				5'b10110: present_state <= {`instruct5, `one}; //instruction 5 Rn anded with shifted Rm
+				5'b10111: present_state <= {`instruct6, `one}; //instruction 6 Rd is shifted negation of Rn
 				default: present_state <= 6'bxxx_xxx;
 			endcase //waitstate
 		end
-		default: present_state <= 6'bxxxxxx;		
+		//default: present_state <= 6'bxxxxxx;		
 	endcase
 
 
@@ -159,7 +159,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 							default: present_state[2:0] <= 3'bxxx;
 						endcase 
 
-		default: present_state <= 6'bxxxxxx;
+		//default: present_state <= 6'bxxxxxx;
 						
 	endcase //present_state instruction
 	
@@ -228,7 +228,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								bsel <= 1'b0;
 							//	w <= 1'b0;
 								end
-	default: begin
+	/*default: begin
 				nsel <= 3'bxxx;
 				vsel <= 4'bxxxx;
 				loada = 1'bx;
@@ -239,6 +239,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 				bsel <= 1'bx;
 				write <= 1'bx;
 			end
+			*/
 
 	
 	endcase
