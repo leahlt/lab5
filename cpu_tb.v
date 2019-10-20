@@ -151,7 +151,11 @@ module cpu_tb ();
   reg1check( {{8{1'b0}}, 8'b0000_1000} );
   
   //Test 2
+<<<<<<< HEAD
   in = 16'b11000_011_000_10_001; // reg 1 shift left = 8 / 2 = 4 in reg 0
+=======
+  in = 16'b11000_011_001_10_000; // Load reg 0 shift left = 8 / 2 = 4 in reg 1
+>>>>>>> parent of c092e86... Added some display statements to cpu_tb and filled in lab 6 top
   
   
    #10;
@@ -175,7 +179,11 @@ module cpu_tb ();
    #10;
   reg7check( {{8{1'b0}}, 8'b0000_1000} );
   
+<<<<<<< HEAD
   //------Instruction 3----------// 23
+=======
+  //------Instruction 3----------//
+>>>>>>> parent of c092e86... Added some display statements to cpu_tb and filled in lab 6 top
   
   //Test 1
   in = 16'b10100_010_001_00_000; // reg 2 + reg 1 = 8 + 4 = 12 in reg 1
@@ -187,7 +195,7 @@ module cpu_tb ();
    
    #10;
   
-  reg1check( {{12{1'b0}}, 4'b1100} );
+  reg1check( {{12{1'b0}}, 16'b1100} );
   
   //Test 2
   in = 16'b10100_010_111_01_001; // reg 2 + reg 1 * 2 = 8 + 24 = 32 in reg 7
@@ -238,7 +246,11 @@ module cpu_tb ();
   statuscheck( 1, 0, 0 );
   
   //Test 3
+<<<<<<< HEAD
   in = 16'b11010_100_1111_1111;  // Load 1_111_1111 to reg 4 (-1)
+=======
+  in = 16'b11010_100_1111_1111; // Load 1_111_1111 to reg 4 (-1)
+>>>>>>> parent of c092e86... Added some display statements to cpu_tb and filled in lab 6 top
   								 // This will turn to binary 1111_1111_1111_1111
    #10; s = 1; @(posedge clk) s <= 0;
    @(posedge w)
