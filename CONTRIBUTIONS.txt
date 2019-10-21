@@ -1,0 +1,36 @@
+Vincent and Leah worked on this lab individually to start, but pair programmed and debugged most of lab6 together.
+
+We worked together on Saturday, October 19th from 1 pm to 7pm at Leah's House.
+We worked together on Sunday, October 20th from 10 am to 4 pm in the MacLeod building.
+We worked together in the MacLeod building on Monday October 21st from 2 pm to 3 pm.
+
+All of the code in lab6 is either our own, provided to us via the source files on piazza, or from the slides/textbook.
+In other words, we did not use someone else's lab5.
+
+The following is a breakdown of the submitted code:
+
+Some edits were made to all lab5 files by both lab partners.
+
+datapath.v was updated by Leah
+
+alu.v was updated by Leah
+
+lab_top.v was updated by Leah
+
+cpu.v:
+	~40 lines written by Vincent (instruction decoder)
+	~60 lines of code written by Leah (cpu top level)
+	~200 lines pair programmed (FSM)
+
+cpu_tb.v ~400 lines pair programmed
+
+Debugging:
+The bulk of time on this lab was spent debugging. The following were SOME of the bugs we encountered and how we fixed them:
+-We noticed that the testbench was stuck running in an infintie loop in spite of having $stop. Leah realized that the wait state output being assigned incorrectly.
+-We noticed that the expected output for the testbench weren't matching the actual outputs. Vincent realized we misunderstood the way the input was formatted. Also, Vincent realized that because of the design we used for our FSM, we needed to add some buffer steps in our instructions to make things happen correctly.
+
+This lab, we really felt the use of ModelSim in debugging for the first time. We were able to visualize how our design worked with the waveform viewer and were able to find many bugs with it.
+Leah noticed a few places were wires were disconnected or had the opposite value assigned to them because of typos in the verilog.
+
+One of the biggest bugs we found was with the De1 demo. Although the w light and the CMP register were working, we could not get the hex to display anything other than zeros.
+After lots of trial and error, we were able to use the waveforms to realize that we had only connected datapath_out but not out (which was used in lab6_top), so there was no input to the display.
