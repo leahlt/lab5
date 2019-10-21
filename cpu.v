@@ -132,7 +132,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 	endcase
 
 
-	case(present_state [5:3])
+	case(present_state [5:3]) //the following case blocks check the steps within each instruction, as soon as one step is completed (clk is high) then the next step is ready to start. If a step is last for an instruction, it will connect back to waitState
 		`instruct1: case(present_state[2:0])
 							`one: present_state <= `waitState;
 							default: present_state <= 6'bxxx_xxx;
