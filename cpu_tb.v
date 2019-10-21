@@ -430,7 +430,7 @@ module cpu_tb ();
   #5;
 
   if(~err) begin
-    $display("All test passed")
+    $display("All test passed");
   end
 
   $stop;

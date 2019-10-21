@@ -182,6 +182,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								nsel <= 3'b001;
 								vsel <= 4'b0100;
 								write <= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct2, `one}: begin 
@@ -191,6 +192,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								bsel <= 1'b0;
 								loadb <= 1'b1;
 								loadc <= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct2, `two}: begin 
@@ -200,6 +202,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								bsel <= 1'b0;
 								loadb <= 1'b1;
 								loadc <= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct2, `three}: begin 
@@ -207,6 +210,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								vsel <= 4'b0001;
 								write <= 1'b1;
 								loadc <= 1'b0;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct2, `four}: begin 
@@ -214,12 +218,14 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								vsel <= 4'b0001;
 								write <= 1'b1;
 								loadc <= 1'b0;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct3, `one}: begin 
 								nsel <= 3'b001;
 								write <= 1'b0;
 								loada<= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct3, `two}: begin 
@@ -229,6 +235,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								loada <= 1'b0;
 								loadb <= 1'b1;
 								loadc <= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct3, `three}: begin 
@@ -238,6 +245,7 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								loada <= 1'b0;
 								loadb <= 1'b1;
 								loadc <= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct3, `four}: begin 
@@ -245,12 +253,14 @@ module controllerFSM(clk, s, reset, opcode, op, w, nsel, loada, loadb, loadc, vs
 								vsel <= 4'b0001;
 								write <= 1'b1;
 								loadc <= 1'b0;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct4, `one}: begin 
 								nsel <= 3'b001;
 								write <= 1'b0;
 								loada <= 1'b1;
+								loads = 1'b0;
 							//	w <= 1'b0;
 								end
 	{`instruct4, `two}: begin 
